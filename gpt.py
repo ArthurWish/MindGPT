@@ -12,20 +12,6 @@ from prompt import *
 
 init_env()
 
-_template = """
-
-    Following the previous prompt, write a prompt that describes the following elements:
-    {desc}
-
-    You should only respond in JSON format, as described below:
-    The return format is as follows:
-    {{
-        "question":"$YOUR_QUESTION_HERE",
-        "answer": "$YOUR_ANSWER_HERE"
-    }}
-    Make sure the response can be parsed by Python json.loads
-    """
-
 
 class GPTChain:
 
@@ -43,10 +29,6 @@ class GPTChain:
         self.output_var = output_var
 
     def print_format(self, input_dict):
-        # prompt = PromptTemplate(
-        #     input_variables=input_var,
-        #     template=_template
-        # )
         prompt_print = PromptTemplate.from_template(self.template)
         print(prompt_print.format(input_dict))
 

@@ -1,0 +1,100 @@
+[
+   {
+      "Question": "点击角色，切换到下一个costume ->",
+      "Answer": [
+         "when this sprite clicked",
+         "switch costume to []",
+         "wait [0.3] seconds",
+         "switch costume to []",
+         "wait [0.3] seconds"
+      ]
+   },
+   {
+      "Question": "点击绿旗，改变背景并使角色说话 ->",
+      "Answer": [
+         "when green flag clicked",
+         "switch backdrop to [Savanna]",
+         "wait [2] seconds",
+         "switch backdrop to [Metro]",
+         "say [Let's explore] for [2] seconds"
+      ]
+   },
+   {
+      "Question": "点击绿旗，如果触碰到角色就播放声音 ->",
+      "Answer": [
+         "when green flag clicked",
+         "forever",
+         "if touching [star] then",
+         "play sound [Collect] until done"
+      ]
+   },
+   {
+      "Question": "点击绿旗，如果触碰到角色播放声音并增加分数 ->",
+      "Answer": [
+         "when green flag clicked",
+         "set [Score] to [0]",
+         "forever",
+         "if touching [star] then",
+         "change [Score] by [1]",
+         "play sound [Collect] until done"
+      ]
+   },
+   {
+      "Question": "点击绿旗，当分数足够切换背景 ->",
+      "Answer": [
+         "when green flag clicked",
+         "switch backdrop to []",
+         "wait until (Score) == (10)",
+         "switch backdrop to [Nebula]",
+         "when backdrop switches to [Nebula]",
+         "play sound [Win] until done"
+      ]
+   },
+   {
+      "Question": "按下空格，使角色跳起来 ->",
+      "Answer": [
+         "when [space] key pressed",
+         "change y by [60]",
+         "wait [0.3] seconds",
+         "change y by [-60]"
+      ]
+   },
+   {
+      "Question": "按下空格，改变角色姿势 ->",
+      "Answer": [
+         "when [space] key pressed",
+         "switch costume to [max-c]",
+         "wait [0.3] seconds",
+         "switch costume to [max-b]"
+      ]
+   },
+   {
+      "Question": "点击绿旗，实现角色跑步动画 ->",
+      "Answer": [
+         "when green flag clicked",
+         "go to x:[-140],y:[-60]",
+         "repeat [50]",
+         "move [10] steps",
+         "next costume"
+      ]
+   },
+   {
+      "Question": "点击绿旗，使两个角色对话 ->",
+      "Answer": [
+         "when green flag clicked",
+         "say [I have a pet owl!] for [2] seconds",
+         "wait [2] seconds",
+         "when green flag clicked",
+         "wait [2] seconds",
+         "say [What's its name] for [2] seconds"
+      ]
+   },
+   {
+      "Question": "点击角色，改变颜色，播放声音 ->",
+      "Answer": [
+         "when this sprite clicked",
+         "change [color] effect by [25]",
+         "play sound [Magic Spell]"
+      ]
+   }
+]
