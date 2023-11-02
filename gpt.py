@@ -1,15 +1,14 @@
+import ast
 from langchain.prompts import ChatPromptTemplate
 from langchain.chat_models import ChatOpenAI
 from env import *
 import openai
 from langchain.prompts import PromptTemplate
-from typing_extensions import Protocol
 from typing import List
-from langchain.chat_models import ChatOpenAI
 from langchain.chains import LLMChain
 import json
 from prompt import *
-
+import re
 init_env()
 
 
@@ -21,8 +20,8 @@ class GPTChain:
             input_variables=input_var,
             template=_template
         )
-        # prompt_print = PromptTemplate.from_template(_template)
-        # print(prompt_print.format(project="car", sprites="stuff"))
+        # # prompt_print = PromptTemplate.from_template(_template)
+        # # print(prompt_print.format(project="car", sprites="stuff"))
         self.template = _template
         self.chain = LLMChain(prompt=prompt, llm=llm)
         self.input_var = input_var
@@ -36,13 +35,42 @@ class GPTChain:
         res = self.chain.run(text)
         # 解析json
         result = json.loads(res)
-        return result, self.output_var
+        return result
 
+
+class FewGPTChain:
+
+    def __init__(self, input_var: List, few_shot_prompt: str, output_var: List) -> None:
+        llm = ChatOpenAI(model=MODEL, openai_api_key=openai.api_key)
+        self.chain = LLMChain(prompt=few_shot_prompt, llm=llm)
+        self.input_var = input_var
+        self.output_var = output_var
+        self.prompt = few_shot_prompt
+
+    def print_format(self):
+        print(self.prompt.format())
+
+    def str_to_list(self, s):
+        pattern = re.compile(r"\[\'(.*?)\'\]")
+        match = pattern.search(s)
+        if not match:
+            return None
+        
+        content = match.group(1)
+        parts = content.split("', '")
+        result = [part.replace("\\'", "'") for part in parts]
+        return result
+
+    def run(self, text):
+        res: str = self.chain.run(text)
+        print(res)
+        # result = json.loads(res)
+        return self.str_to_list(res)
 
 # text_refine = GPTChain(NewObject.input_var, NewObject.prompt, NewObject.output_var)
 # print(text_refine.run({"project": "一个关于龟兔赛跑的故事", "sprites": "[兔子，乌龟，汽车，障碍物]"}))
-t2i = GPTChain(T2I.input_var, T2I.prompt, T2I.output_var)
-print(t2i.run({"project": "一个关于龟兔赛跑的故事", "drawing": "终点线"}))
+# t2i = GPTChain(T2I.input_var, T2I.prompt, T2I.output_var)
+# print(t2i.run({"project": "一个关于龟兔赛跑的故事", "drawing": "终点线"}))
 
 
 def create_chat_completion(messages,
