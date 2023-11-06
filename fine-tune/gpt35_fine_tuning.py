@@ -4,7 +4,7 @@ import re
 import openai
 os.environ["HTTP_PROXY"] = "http://127.0.0.1:7890"
 os.environ["HTTPS_PROXY"] = "http://127.0.0.1:7890"
-os.environ["OPENAI_API_KEY"] = "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"
+os.environ["OPENAI_API_KEY"] = "your api"
 openai.api_key = os.getenv("OPENAI_API_KEY")
 # Replace with the actual path to your file
 path = '/media/sda1/cyn-workspace/generative_mm/fine-tune/code.jsonl'
