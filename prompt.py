@@ -4,7 +4,16 @@ from langchain.prompts import (
     FewShotChatMessagePromptTemplate,
     ChatPromptTemplate,
 )
+from langchain.chains import LLMChain
+from langchain.memory import ConversationBufferMemory
 # PROMPT_NEW = json.load(open("./scratch_prompt.json", "r"))
+from langchain.chat_models import ChatOpenAI
+from langchain.schema import SystemMessage
+from langchain.prompts import (
+    ChatPromptTemplate,
+    HumanMessagePromptTemplate,
+    MessagesPlaceholder,
+)
 
 
 @dataclass
@@ -160,27 +169,27 @@ class CodeGeneration:
     input_var = ["logic", "previous_code"]
     output_var = ["question", "answer"]
     examples = [
-        {"logic": "Click on the character to switch to the next costume", 
+        {"logic": "Click on the character to switch to the next costume",
          "code": [
-         "when this sprite clicked",
-         "switch costume to []",
-         "wait [0.3] seconds",
-         "switch costume to []",
-         "wait [0.3] seconds"
+             "when this sprite clicked",
+             "switch costume to []",
+             "wait [0.3] seconds",
+             "switch costume to []",
+             "wait [0.3] seconds"
          ]},
-        {"logic": "Click on the green flag to change the background and make the character talk", 
+        {"logic": "Click on the green flag to change the background and make the character talk",
          "code": [
-         "when green flag clicked",
-         "switch backdrop to [Savanna]",
-         "wait [2] seconds",
-         "switch backdrop to [Metro]",
-         "say [Let's explore] for [2] seconds"
+             "when green flag clicked",
+             "switch backdrop to [Savanna]",
+             "wait [2] seconds",
+             "switch backdrop to [Metro]",
+             "say [Let's explore] for [2] seconds"
          ]},
-        {"logic": "Click on the character to change the color and play the sound", 
+        {"logic": "Click on the character to change the color and play the sound",
          "code": [
-         "when this sprite clicked",
-         "change [color] effect by [25]",
-         "play sound [Magic Spell]"
+             "when this sprite clicked",
+             "change [color] effect by [25]",
+             "play sound [Magic Spell]"
          ]}
     ]
     example_prompt = ChatPromptTemplate.from_messages(

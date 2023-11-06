@@ -74,7 +74,7 @@ class FewGPTChain:
 
 
 class GPTFineTuned:
-    
+
     def code_generation(self, content, model_id="ft:gpt-3.5-turbo-0613:personal::8HnuPdtX"):
         response = openai.ChatCompletion.create(
             model=model_id,
@@ -87,8 +87,7 @@ class GPTFineTuned:
         return re.findall(r'\"(.*?)\"', response.choices[0].message["content"])
 
 
-
-def create_chat_completion(self, messages,
+def create_chat_completion(messages,
                            model=None,
                            temperature=0,
                            max_tokens=None) -> str:
@@ -118,3 +117,36 @@ def translate_to_english(content):
     return create_chat_completion(model="gpt-3.5-turbo",
                                   messages=temp_memory,
                                   temperature=0)
+
+
+@dataclass
+class Memory:
+    def __init__(self, model):
+        self.system_message = {
+            "role": "system", "content": "You are a helpful Scratch programming teacher."}
+        self.init_user_message = {
+            "role": "user", "content": """
+            I have a dictionary recording the mind map of Scratch programming
+            """
+        }
+        self.model = model
+        self.chat_messages = []
+        self.chat_messages.append(self.system_message)
+
+    def create_chat_completion(self, messages,
+                               temperature=0,
+                               max_tokens=None) -> str:
+        """Create a chat completion using the OpenAI API"""
+        response = None
+
+        response = openai.ChatCompletion.create(model=self.model,
+                                                messages=messages,
+                                                temperature=temperature,
+                                                max_tokens=max_tokens)
+        if response is None:
+            raise RuntimeError("Failed to get response")
+
+        return response.choices[0].message["content"]
+
+    def add_user_message(self, message):
+        pass
