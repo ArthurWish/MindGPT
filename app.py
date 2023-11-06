@@ -1,5 +1,6 @@
 import base64
 import io
+import re
 from typing import List
 from flask import Flask, jsonify, request, make_response
 import os
@@ -8,9 +9,9 @@ import json
 from PIL import Image
 import requests
 from prompt import *
-from gpt import FewGPTChain, GPTChain, create_chat_completion, translate_to_english
+from gpt import FewGPTChain, GPTChain, GPTFineTuned, create_chat_completion, translate_to_english
 from image import generate_controlnet, generate_draw
-
+from audio import generate_audio
 app = Flask(__name__)
 CORS(app, resources=r"/*", supports_credentials=True, origins='*')
 # CORS(app, resources=r"/*")
@@ -65,17 +66,19 @@ def image_to_image():
 
 @app.route('/api/text_to_sound', methods=['POST'])
 def text_to_sound():
-    api_url = 'http://127.0.0.1:5555/generate'
-    prompt = request.json.get('text')
+    """ audio generate function version """
+    # api_url = 'http://127.0.0.1:5555/generate'
+    prompt = request.json.get('prompt')
     steps = 200
-    data = {
-        "prompt": prompt,
-        "steps": steps
-    }
-    headers = {'Content-type': 'application/json'}
-    response = requests.post(api_url, data=json.dumps(data), headers=headers)
-    if response.status_code == 200:
-        audio_data_b64 = response.json()['audio_data']
+    # data = {
+    #     "prompt": prompt,
+    #     "steps": steps
+    # }
+    # headers = {'Content-type': 'application/json'}
+    # response = requests.post(api_url, data=json.dumps(data), headers=headers)
+    audio_data_b64 = generate_audio(prompt, steps)
+    # if response.status_code == 200:
+    #     audio_data_b64 = response.json()['audio_data']
     return jsonify({'sound': audio_data_b64})
 
 
@@ -87,6 +90,7 @@ def character_decomposition():
                         ScratchFunction.final_prompt, ScratchFunction.output_var)
     # print("scratch_func" + sprite + project)
     scratch_func: List = chain.run({"sprite": sprite})
+    print(scratch_func)
     return jsonify({'answer': scratch_func})
     # return jsonify({'answer': scratch_func["answer"]})
 
@@ -99,20 +103,22 @@ def new_logic():
     chain = FewGPTChain(DetailLogic.input_var,
                         DetailLogic.final_prompt, DetailLogic.output_var)
     logic = chain.run({"function": function})
-
+    print(logic)
     return jsonify({'logic': logic})
 
 
 @app.route('/api/generate_code', methods=['POST'])
 def generate_code():
     logic = request.json.get('logic')
-    previous_code = request.json.get('previous_code')
-    chain = FewGPTChain(CodeGeneration.input_var,
-                     CodeGeneration.final_prompt, CodeGeneration.output_var)
-    code = chain.run({"logic": logic})
+    # previous_code = request.json.get('previous_code')
+    # chain = FewGPTChain(CodeGeneration.input_var,
+    #                  CodeGeneration.final_prompt, CodeGeneration.output_var)
+    # code = chain.run({"logic": logic})
+    code = GPTFineTuned.code_generation(content=logic)
+    extracted_list = re.findall(r'\"(.*?)\"', code)
     # scratch_block = "base64_encoded_Scratch_block_image_generated_from_"
-    return jsonify({'code': code})
+    return jsonify({'code': extracted_list})
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5500, debug=False)
+    app.run(host='0.0.0.0', port=55233, debug=False)

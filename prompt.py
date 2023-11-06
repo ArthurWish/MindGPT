@@ -30,9 +30,9 @@ class T2I:
     input_var = ["drawing"]
     output_var = ["prompt"]
     prompt = """
-        You are an expert on prompt engineering for text to image generation. Here is a text description: {drawing}
-        I will give you a example, fill the prompt with knowledge for <{drawing}>.
-        template "[character], [artist], [style]", Example:Cute small dog, full character, design by mark ryden and pixar and hayao miyazaki, 2D, animation, cartoon, high quality, 4k.
+        You are an expert on prompt engineering for text to image generation. Here is a text description: {drawing}, fill the prompt with knowledge for <{drawing}>
+        I will give you a example.
+        prompt: "Cute small dog, full character, design by mark ryden and pixar and hayao miyazaki, 2D, animation, cartoon, high quality, 4k."
         The return format is as follows:
         {{
             "prompt": "$YOUR_PROMPT"

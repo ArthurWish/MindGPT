@@ -55,7 +55,7 @@ class FewGPTChain:
         match = pattern.search(s)
         if not match:
             return None
-        
+
         content = match.group(1)
         parts = content.split("', '")
         result = [part.replace("\\'", "'") for part in parts]
@@ -73,7 +73,22 @@ class FewGPTChain:
 # print(t2i.run({"project": "一个关于龟兔赛跑的故事", "drawing": "终点线"}))
 
 
-def create_chat_completion(messages,
+class GPTFineTuned:
+    
+    def code_generation(self, content, model_id="ft:gpt-3.5-turbo-0613:personal::8HnuPdtX"):
+        response = openai.ChatCompletion.create(
+            model=model_id,
+            messages=[
+                {"role": "system",
+                    "content": "You are a Scratch programming expert."},
+                {"role": "user", "content": content}
+            ]
+        )
+        return re.findall(r'\"(.*?)\"', response.choices[0].message["content"])
+
+
+
+def create_chat_completion(self, messages,
                            model=None,
                            temperature=0,
                            max_tokens=None) -> str:
