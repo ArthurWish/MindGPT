@@ -9,8 +9,9 @@ from langchain.chains import LLMChain
 import json
 from prompt import *
 import re
-init_env()
 
+init_env()
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 class GPTChain:
 
@@ -121,9 +122,9 @@ def translate_to_english(content):
 
 @dataclass
 class Memory:
-    def __init__(self, model, memory: Dict):
+    def __init__(self, model):
         self.system_message = {
-            "role": "system", "content": f"You are a helpful Scratch programming teacher. Your task is to answer my questions based on the mind map below in the form of a dictionary: {memory}"}
+            "role": "system", "content": f"You are a helpful Scratch programming teacher."}
         self.model = model
         self.chat_messages = []
         self.chat_messages.append(self.system_message)
@@ -143,7 +144,11 @@ class Memory:
 
         return response.choices[0].message["content"]
 
-    def add_user_message(self, message):
+    def add_user_message(self, user_message, memory: Dict):
+        memory_message = f"""Your task is to answer my questions based on the mind map below in the form of a dictionary: {memory}\n"""
+        message = memory_message+user_message
+        print("add_user_message", message)
         self.chat_messages.append(message)
         response = create_chat_completion(self.chat_messages)
-        self.chat_messages.append("user")
+        self.chat_messages.append({"role": "assistant", "content": response})
+        return response

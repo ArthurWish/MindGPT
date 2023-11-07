@@ -11,6 +11,7 @@ import requests
 from prompt import *
 from gpt import FewGPTChain, GPTChain, GPTFineTuned, create_chat_completion, translate_to_english
 from image import generate_controlnet, generate_draw
+from prompt_base import *
 app = Flask(__name__)
 CORS(app, resources=r"/*", supports_credentials=True, origins='*')
 # CORS(app, resources=r"/*")
@@ -80,6 +81,7 @@ def text_to_sound():
     # audio_data_b64 = generate_audio(prompt, steps)
     if response.status_code == 200:
         audio_data_b64 = response.json()['audio_data']
+    # print(audio_data_b64)
     return jsonify({'sound': audio_data_b64})
 
 
@@ -122,4 +124,4 @@ def generate_code():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=55233, debug=False)
+    app.run(host='0.0.0.0', port=5500, debug=False)
