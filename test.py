@@ -1,7 +1,7 @@
 from env import *
 
 from prompt import *
+from gpt import *
 init_env()
-memory = Memory(system_message="chatbot")
-content = memory.completion(input="Not too bad - how are you?")
-print(content)
+gpt_ = GPTFineTuned()
+print(gpt_.code_generation(content="当汽车碰到障碍物，分数减1，颜色变红"))

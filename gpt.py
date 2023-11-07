@@ -89,7 +89,7 @@ class GPTFineTuned:
 
 
 def create_chat_completion(messages,
-                           model=None,
+                           model=MODEL,
                            temperature=0,
                            max_tokens=None) -> str:
     """Create a chat completion using the OpenAI API"""
@@ -144,11 +144,10 @@ class Memory:
 
         return response.choices[0].message["content"]
 
-    def add_user_message(self, user_message, memory: Dict):
-        memory_message = f"""Your task is to answer my questions based on the mind map below in the form of a dictionary: {memory}\n"""
-        message = memory_message+user_message
-        print("add_user_message", message)
-        self.chat_messages.append(message)
-        response = create_chat_completion(self.chat_messages)
+    def ask_gpt(self, user_message):
+        user_message = {"role": "user", "content": user_message}
+        self.chat_messages.append(user_message)
+        print(self.chat_messages)
+        response = self.create_chat_completion(self.chat_messages)
         self.chat_messages.append({"role": "assistant", "content": response})
         return response

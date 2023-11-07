@@ -9,35 +9,39 @@ import json
 from PIL import Image
 import requests
 from prompt import *
-from gpt import FewGPTChain, GPTChain, GPTFineTuned, create_chat_completion, translate_to_english
+from gpt import *
 from image import generate_controlnet, generate_draw
 from prompt_base import *
 app = Flask(__name__)
 CORS(app, resources=r"/*", supports_credentials=True, origins='*')
-# CORS(app, resources=r"/*")
 os.makedirs('./static', exist_ok=True)
 os.makedirs('./static/images', exist_ok=True)
 
-memory_dict = []
-
+object_memory = Memory(model=MODEL)
+function_memory = Memory(model=MODEL)
+logic_memory = Memory(model=MODEL)
 
 @app.route('/hello', methods=['GET'])
 def hello():
     return 'hello'
 
+# @app.route('/api/update_memory', method)
+
 
 @app.route('/api/new_object', methods=['POST'])
 def new_object():
+    # input xxx
     project = request.json.get('project')
-    sprites = request.json.get('sprites')
-    if sprites is None:
-        sprites = ""
-    chain = GPTChain(NewObject.input_var, NewObject.prompt,
-                     NewObject.output_var)
-    new_object = chain.run({"project": project, "sprites": sprites})
-    print(new_object["spriteName"])  # description
-    print(new_object["description"])
-    return jsonify({'spriteName': new_object["spriteName"], 'description': new_object["description"]})
+    memory_dict = request.json.get('memory_dict')
+    if project is None:
+        return "project is none"
+    user_message = object_prompt.format(memory=memory_dict)
+    response = object_memory.ask_gpt(user_message=user_message)
+    print("response", response)
+    response = json.loads(response)
+    print(response["object"])  # description
+    print(response["description"])
+    return jsonify({'spriteName': response["object"], 'description': response["description"]})
 
 
 @app.route('/api/text_to_image', methods=['POST'])
@@ -87,27 +91,32 @@ def text_to_sound():
 
 @app.route('/api/character_decomposition', methods=['POST'])
 def character_decomposition():
-    project = request.json.get('project')
-    sprite = request.json.get('sprite')
-    chain = FewGPTChain(ScratchFunction.input_var,
-                        ScratchFunction.final_prompt, ScratchFunction.output_var)
-    # print("scratch_func" + sprite + project)
-    scratch_func: List = chain.run({"sprite": sprite})
-    print(scratch_func)
-    return jsonify({'answer': scratch_func})
+    question = request.json.get('question')
+    memory_dict = request.json.get('memory_dict')
+    if memory_dict is None:
+        return "Input the mind map"
+    user_message = function_prompt.format(
+        question=question, memory=memory_dict)
+    response = function_memory.ask_gpt(user_message=user_message)
+    print("response", response)
+    response = json.loads(response)
+    return jsonify({'answer': response["function"]})
     # return jsonify({'answer': scratch_func["answer"]})
 
 
 @app.route('/api/new_logic', methods=['POST'])
 def new_logic():
-    function = request.json.get('function')
-    previous_logic = request.json.get('previous_logic')
+    question = request.json.get('question')
+    memory_dict = request.json.get('memory_dict')
     # print(function)
-    chain = FewGPTChain(DetailLogic.input_var,
-                        DetailLogic.final_prompt, DetailLogic.output_var)
-    logic = chain.run({"function": function})
-    print(logic)
-    return jsonify({'logic': logic})
+    if memory_dict is None:
+            return "Input the mind map"
+    user_message = logic_prompt.format(
+        question=question, memory=memory_dict)
+    response = logic_memory.ask_gpt(user_message=user_message)
+    print("response", response)
+    response = json.loads(response)
+    return jsonify({'logic': response["logic"]})
 
 
 @app.route('/api/generate_code', methods=['POST'])
@@ -119,9 +128,8 @@ def generate_code():
     # code = chain.run({"logic": logic})
     code = GPTFineTuned.code_generation(content=logic)
     extracted_list = re.findall(r'\"(.*?)\"', code)
-    # scratch_block = "base64_encoded_Scratch_block_image_generated_from_"
     return jsonify({'code': extracted_list})
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5500, debug=False)
+    app.run(host='0.0.0.0', port=5510, debug=False)
