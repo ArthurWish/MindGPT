@@ -11,12 +11,13 @@ import requests
 from prompt import *
 from gpt import FewGPTChain, GPTChain, GPTFineTuned, create_chat_completion, translate_to_english
 from image import generate_controlnet, generate_draw
-from audio import generate_audio
 app = Flask(__name__)
 CORS(app, resources=r"/*", supports_credentials=True, origins='*')
 # CORS(app, resources=r"/*")
 os.makedirs('./static', exist_ok=True)
 os.makedirs('./static/images', exist_ok=True)
+
+memory_dict = []
 
 
 @app.route('/hello', methods=['GET'])
@@ -66,19 +67,19 @@ def image_to_image():
 
 @app.route('/api/text_to_sound', methods=['POST'])
 def text_to_sound():
-    """ audio generate function version """
-    # api_url = 'http://127.0.0.1:5555/generate'
+    """ audio generate api version """
+    api_url = 'http://127.0.0.1:5555/generate'
     prompt = request.json.get('prompt')
     steps = 200
-    # data = {
-    #     "prompt": prompt,
-    #     "steps": steps
-    # }
-    # headers = {'Content-type': 'application/json'}
-    # response = requests.post(api_url, data=json.dumps(data), headers=headers)
-    audio_data_b64 = generate_audio(prompt, steps)
-    # if response.status_code == 200:
-    #     audio_data_b64 = response.json()['audio_data']
+    data = {
+        "prompt": prompt,
+        "steps": steps
+    }
+    headers = {'Content-type': 'application/json'}
+    response = requests.post(api_url, data=json.dumps(data), headers=headers)
+    # audio_data_b64 = generate_audio(prompt, steps)
+    if response.status_code == 200:
+        audio_data_b64 = response.json()['audio_data']
     return jsonify({'sound': audio_data_b64})
 
 

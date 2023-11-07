@@ -4,7 +4,7 @@ from langchain.chat_models import ChatOpenAI
 from env import *
 import openai
 from langchain.prompts import PromptTemplate
-from typing import List
+from typing import List, Dict
 from langchain.chains import LLMChain
 import json
 from prompt import *
@@ -121,14 +121,9 @@ def translate_to_english(content):
 
 @dataclass
 class Memory:
-    def __init__(self, model):
+    def __init__(self, model, memory: Dict):
         self.system_message = {
-            "role": "system", "content": "You are a helpful Scratch programming teacher."}
-        self.init_user_message = {
-            "role": "user", "content": """
-            I have a dictionary recording the mind map of Scratch programming
-            """
-        }
+            "role": "system", "content": f"You are a helpful Scratch programming teacher. Your task is to answer my questions based on the mind map below in the form of a dictionary: {memory}"}
         self.model = model
         self.chat_messages = []
         self.chat_messages.append(self.system_message)
@@ -149,4 +144,6 @@ class Memory:
         return response.choices[0].message["content"]
 
     def add_user_message(self, message):
-        pass
+        self.chat_messages.append(message)
+        response = create_chat_completion(self.chat_messages)
+        self.chat_messages.append("user")
