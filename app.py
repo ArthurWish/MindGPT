@@ -17,20 +17,18 @@ CORS(app, resources=r"/*", supports_credentials=True, origins='*')
 os.makedirs('./static', exist_ok=True)
 os.makedirs('./static/images', exist_ok=True)
 
-object_memory = Memory(model=MODEL)
-function_memory = Memory(model=MODEL)
-logic_memory = Memory(model=MODEL)
+object_memory = Memory(model=GPTType.gpt_4)
+function_memory = Memory(model=GPTType.gpt_4)
+logic_memory = Memory(model=GPTType.gpt_4)
+
 
 @app.route('/hello', methods=['GET'])
 def hello():
     return 'hello'
 
-# @app.route('/api/update_memory', method)
-
 
 @app.route('/api/new_object', methods=['POST'])
 def new_object():
-    # input xxx
     project = request.json.get('project')
     memory_dict = request.json.get('memory_dict')
     if project is None:
@@ -47,10 +45,11 @@ def new_object():
 @app.route('/api/text_to_image', methods=['POST'])
 def text_to_image():
     text = request.json.get('text')
-    chain = GPTChain(T2I.input_var, T2I.prompt, T2I.output_var)
-    content = chain.run({"drawing": translate_to_english(text)})
-    prompt = content["prompt"]
-    image_base64 = generate_draw(prompt, './static/test.png')
+    drawing_agent = GPTTools(GPTType.gpt_3, "Output the IDEA in JSON format.")
+    response = drawing_agent.create_chat_completion(
+        user_message=drawing_prompt.format(drawing=text))
+    response = json.loads(response)
+    image_base64 = generate_draw(response["prompt"], './static/test.png')
     return jsonify({'image': image_base64})
 
 
@@ -58,15 +57,19 @@ def text_to_image():
 def image_to_image():
     text = request.json.get('text')  # user input
     image_base64 = request.json.get('user_image')  # base64
+    if image_base64 is None:
+        return "image_base64 is none"
     base_img_bytes = base64.b64decode(image_base64)
     img = Image.open(io.BytesIO(base_img_bytes)).convert('RGBA')
     bg = Image.new('RGBA', img.size, (255, 255, 255))
     combined = Image.alpha_composite(bg, img)
     combined.convert('RGB').save('./static/temp.png', 'PNG')
-    chain = GPTChain(T2I.input_var, T2I.prompt, T2I.output_var)
-    content = chain.run({"drawing": translate_to_english(text)})
+    drawing_agent = GPTTools(GPTType.gpt_3, "Output the IDEA in JSON format.")
+    response = drawing_agent.create_chat_completion(
+        user_message=drawing_prompt.format(drawing=text))
+    response = json.loads(response)
     image_base64 = generate_controlnet(
-        prompt=content['prompt'], base_image="./static/temp.png")
+        prompt=response['prompt'], base_image="./static/temp.png")
     return jsonify({'image': image_base64})
 
 
@@ -110,7 +113,7 @@ def new_logic():
     memory_dict = request.json.get('memory_dict')
     # print(function)
     if memory_dict is None:
-            return "Input the mind map"
+        return "Input the mind map"
     user_message = logic_prompt.format(
         question=question, memory=memory_dict)
     response = logic_memory.ask_gpt(user_message=user_message)

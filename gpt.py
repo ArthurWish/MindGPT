@@ -13,6 +13,7 @@ import re
 init_env()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
+
 class GPTChain:
 
     def __init__(self, input_var: List, _template: str, output_var: List) -> None:
@@ -121,10 +122,39 @@ def translate_to_english(content):
 
 
 @dataclass
+class GPTType:
+    gpt_3 = "gpt-3.5-turbo-1106"
+    gpt_4 = "gpt-4-1106-preview"
+
+
+class GPTTools:
+    # TODO 完成不同类型任务切换不同能力的gpt
+    def __init__(self, model, system_prompt) -> None:
+        self.model = model
+        self.messages = [{"role": "system", "content": system_prompt}]
+
+    def create_chat_completion(self, user_message,
+                               temperature=0,
+                               max_tokens=None) -> str:
+        """Create a chat completion using the OpenAI API"""
+        user_message = {"role": "user", "content": user_message}
+        self.messages.append(user_message)
+        response = openai.ChatCompletion.create(model=self.model,
+                                                messages=self.messages,
+                                                response_format={
+                                                    "type": "json_object"},
+                                                temperature=temperature,
+                                                max_tokens=max_tokens)
+        if response is None:
+            raise RuntimeError("Failed to get response")
+
+        return response.choices[0].message["content"]
+
+
 class Memory:
     def __init__(self, model):
         self.system_message = {
-            "role": "system", "content": f"You are a helpful Scratch programming teacher."}
+            "role": "system", "content": "You are a helpful Scratch programming teacher. The return format is JSON format."}
         self.model = model
         self.chat_messages = []
         self.chat_messages.append(self.system_message)
@@ -137,6 +167,8 @@ class Memory:
 
         response = openai.ChatCompletion.create(model=self.model,
                                                 messages=messages,
+                                                response_format={
+                                                    "type": "json_object"},
                                                 temperature=temperature,
                                                 max_tokens=max_tokens)
         if response is None:

@@ -28,25 +28,33 @@ object_prompt = """
     Extracted objects: ["小猫", "鱼"]
     Generated object: {{ "钓鱼竿": "猫手里的鱼竿，用来钓鱼" }}
     The following is a mind map that children will want to complete: {memory}.
-    No need to write down the reasoning process, just tell me the final result. The return format is as follows:
+    No need to write down the reasoning process, just tell me the final result. The return format is JSON format:
     {{
         "object": "$object"
         "description": "$description"
     }}
-    Make sure the response can be parsed by Python json.loads.
 """
 
 
 drawing_prompt = """
-    The following is a mind map that children want to complete: {memory}.
-    You are an expert on prompt engineering for text to image generation. Here is a text description: {drawing}, fill the prompt with knowledge for <{drawing}>
-    I will give you a example.
-    prompt: "Cute small dog, full character, design by mark ryden and pixar and hayao miyazaki, 2D, animation, cartoon, high quality, 4k."
-    The return format is as follows:
-    {{
-        "prompt": "$YOUR_PROMPT"
-    }}
-    Make sure the response can be parsed by Python json.loads
+    Stable Diffusion is an AI art generation model similar to DALLE-2.
+    Here are some prompts for generating art with Stable Diffusion. 
+
+    Example:
+    - Create an image of a colorful, enchanting fantasy castle surrounded by a magical forest. The castle should have tall, whimsical spires and be adorned with sparkling gems. The forest is filled with friendly animals, like talking rabbits and dancing birds, and the trees have leaves in various bright colors. There are also mystical flowers glowing softly, and a clear blue sky with a rainbow in the background.
+    - Illustrate a vibrant scene of children having a space adventure in a cartoon-style spaceship. The spaceship is bright and friendly-looking, with large windows and fun, whimsical shapes. Inside, children of various descents are wearing colorful space suits and helmets, looking out at a starry galaxy with planets and comets. Include a friendly alien waving at them from a nearby planet.
+    - Depict an underwater exploration scene with children in a submarine. The submarine is shaped like a large, friendly fish and is exploring a beautiful coral reef. Around the submarine are various sea creatures like smiling dolphins, colorful fish, and a gentle turtle. The water is a clear, shimmering blue, and sunbeams are filtering through from the surface.
+    
+    The prompt should adhere to and include all of the following rules:
+
+    - Prompt should always be written in English, regardless of the input language. Please provide the prompts in English.
+    - Each prompt should consist of a description of the scene followed by modifiers divided by commas.
+    - When generating descriptions, focus on portraying the visual elements rather than delving into abstract psychological and emotional aspects. Provide clear and concise details that vividly depict the scene and its composition, capturing the tangible elements that make up the setting.
+    - The modifiers should alter the mood, style, lighting, and other aspects of the scene.
+    - Multiple modifiers can be used to provide more specific details.
+    
+    I want you to write me one single prompt exactly about the IDEA follow the rules above:
+    IDEA: {drawing}
 """
 
 function_prompt = """
@@ -79,12 +87,10 @@ function_prompt = """
     Generated function: {{ "track": "Make a sound when approaching the track" }}
     Question: {question}
     Mind map: {memory}
-    No need to write down the reasoning process, just tell me the final result. The return format is as follows:
-    The return format is as follows:
+    No need to write down the reasoning process, just tell me the final result. The return format is JSON format:
     {{
         "function": "$GENERATED_FUNCSION"
     }}
-    Make sure the response can be parsed by Python json.loads
     """
 
 logic_prompt = """
@@ -133,9 +139,8 @@ logic_prompt = """
     Generated logic: {{ "logic": "When the car touches the track color, wait 0.2s and change the car color" }}\n
     Question: {question}
     Mind map: {memory}
-    No need to write down the reasoning process, just tell me the final result. The return format is as follows:
+    No need to write down the reasoning process, just tell me the final result. The return format is JSON format:
     {{
         "logic": "$GENERATED_LOGIC"
     }}
-    Make sure the response can be parsed by Python json.loads
 """
