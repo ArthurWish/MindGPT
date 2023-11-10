@@ -77,13 +77,16 @@ class FewGPTChain:
 
 class GPTFineTuned:
 
-    def code_generation(self, content, model_id="ft:gpt-3.5-turbo-0613:personal::8HnuPdtX"):
+    def __init__(self, model_id) -> None:
+        self.model_id = model_id
+    
+    def code_generation(self, user_message):
         response = openai.ChatCompletion.create(
-            model=model_id,
+            model=self.model_id,
             messages=[
                 {"role": "system",
                     "content": "You are a Scratch programming expert."},
-                {"role": "user", "content": content}
+                {"role": "user", "content": user_message}
             ]
         )
         return re.findall(r'\"(.*?)\"', response.choices[0].message["content"])

@@ -129,7 +129,8 @@ def generate_code():
     # chain = FewGPTChain(CodeGeneration.input_var,
     #                  CodeGeneration.final_prompt, CodeGeneration.output_var)
     # code = chain.run({"logic": logic})
-    code = GPTFineTuned.code_generation(content=logic)
+    gpt_tuned = GPTFineTuned("ft:gpt-3.5-turbo-0613:personal::8HnuPdtX")
+    code = gpt_tuned.code_generation(logic)
     extracted_list = re.findall(r'\"(.*?)\"', code)
     return jsonify({'code': extracted_list})
 
