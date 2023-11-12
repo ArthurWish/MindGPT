@@ -33,13 +33,15 @@ def new_object():
     response = json.loads(response)
     # print("response["object"]", response["object"])  # description
     # print(response["description"])
-    return jsonify({'spriteName': response["object"], 'description': response["description"]})
+    spriteName = list(response["object"].keys())[0]
+    description = response["object"][spriteName]
+    return jsonify({'spriteName': spriteName, 'description': description})
 
 
 @app.route('/api/text_to_image', methods=['POST'])
 def text_to_image():
     text = request.json.get('text')
-    drawing_agent = GPTTools(GPTType.gpt_3, "Output in JSON format.")
+    drawing_agent = GPTTools(GPTType.gpt_3, "Response in English. Output in JSON format.")
     response = drawing_agent.create_chat_completion(
         user_message=drawing_prompt_new.format(drawing=text))
     response = json.loads(response)
@@ -60,7 +62,7 @@ def image_to_image():
     bg = Image.new('RGBA', img.size, (255, 255, 255))
     combined = Image.alpha_composite(bg, img)
     combined.convert('RGB').save('./static/temp.png', 'PNG')
-    drawing_agent = GPTTools(GPTType.gpt_3, "Output in JSON format.")
+    drawing_agent = GPTTools(GPTType.gpt_3, "Response in English. Output in JSON format.")
     response = drawing_agent.create_chat_completion(
         user_message=drawing_prompt_new.format(drawing=text))
     response = json.loads(response)
@@ -75,12 +77,17 @@ def text_to_sound():
     """ audio generate api version """
     api_url = 'http://127.0.0.1:5555/generate'
     prompt = request.json.get('prompt')
+    sound_agent = GPTTools(GPTType.gpt_3, "Response in English. Output in JSON format.")
+    response = sound_agent.create_chat_completion(
+        user_message=sound_prompt.format(sound=prompt))
+    response = json.loads(response)
+    print("prompt", response['prompt'])
+    headers = {'Content-type': 'application/json'}
     steps = 200
     data = {
-        "prompt": prompt,
+        "prompt": response['prompt'],
         "steps": steps
     }
-    headers = {'Content-type': 'application/json'}
     response = requests.post(api_url, data=json.dumps(data), headers=headers)
     # audio_data_b64 = generate_audio(prompt, steps)
     if response.status_code == 200:
@@ -101,7 +108,11 @@ def character_decomposition():
     response = function_memory.ask_gpt(user_message=user_message)
     print("response", response)
     response = json.loads(response)
-    return jsonify({'answer': response["function"]})
+    if isinstance(response['function'], str):
+        return jsonify({'answer': response['function']})
+    spriteName = list(response["function"].keys())[0]
+    _function = response["function"][spriteName]
+    return jsonify({'answer': _function})
     # return jsonify({'answer': scratch_func["answer"]})
 
 
@@ -126,6 +137,7 @@ def generate_code():
     logic = request.json.get('logic')
     gpt_tuned = GPTFineTuned("ft:gpt-3.5-turbo-0613:personal::8HnuPdtX")
     code = gpt_tuned.code_generation(logic)
+    print("code", code)
     # extracted_list = re.findall(r'\"(.*?)\"', code)
     return jsonify({'code': code})
 

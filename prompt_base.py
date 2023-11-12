@@ -28,14 +28,13 @@ object_prompt = """
     Extracted objects: ["小猫", "鱼"]
     Generated object: {{ "钓鱼竿": "猫手里的鱼竿，用来钓鱼" }}
     The following is a mind map that children will want to complete: {memory}.
-    No need to write down the reasoning process, just tell me the final result. The return format is JSON format:
+    No need to write down the reasoning process, just tell me the generated object. The return format is JSON format:
     {{
-        "object": "$object"
-        "description": "$description"
+        "object": "$Generated_Object"
     }}
 """
 sound_prompt = """
-    You are an expert on prompting engineering. I will give you some examples, fill the prompt with knowledge for <{content}>. 
+    You are an expert on prompting engineering. I will give you some examples, fill the prompt with knowledge for <{sound}>. 
     
     Example: An audience cheering and clapping.
     Example: Rolling thunder with lightning strikes.
@@ -47,7 +46,7 @@ sound_prompt = """
     }}
 """
 drawing_prompt_new = """
-    You are an expert on prompting engineering for text to image generation. I will give you some examples, fill the prompt with knowledge for <{content}>. 
+    You are an expert on prompting engineering for text to image generation. I will give you some examples, fill the prompt with knowledge for <{drawing}>. 
     template "[character or landscape], [artist], [style]",
     Example: Cute small dog, full character, design by mark ryden and pixar and hayao miyazaki, 2D, animation, cartoon, high quality, 4k. Respond the prompt only, in English.
     Example" best high quality landscape. Ethereal gardens of marble built in a shining teal river in future city. By Dorian Cleavenger. Long shot, studio lighting, octane render.
@@ -110,7 +109,7 @@ function_prompt = """
     Mind map: {memory}
     No need to write down the reasoning process, just tell me the final result. The return format is JSON format:
     {{
-        "function": "$GENERATED_FUNCSION"
+        "function": "$GENERATED_FUNCTION"
     }}
     """
 

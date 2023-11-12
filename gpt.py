@@ -85,7 +85,7 @@ class GPTFineTuned:
             model=self.model_id,
             messages=[
                 {"role": "system",
-                    "content": "You are a Scratch programming expert."},
+                    "content": "You are a Scratch programming expert. Response in Chinese."},
                 {"role": "user", "content": user_message}
             ]
         )
