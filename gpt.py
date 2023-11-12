@@ -12,7 +12,6 @@ import re
 
 init_env()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-client.api_key = os.getenv("OPENAI_API_KEY")
 
 
 class GPTChain:
@@ -158,7 +157,7 @@ class GPTTools:
 class Memory:
     def __init__(self, model):
         self.system_message = {
-            "role": "system", "content": "You are a helpful Scratch programming teacher. The return format is JSON format."}
+            "role": "system", "content": "You are a helpful Scratch programming teacher. Answer in Chinese. The return format is JSON format."}
         self.model = model
         self.chat_messages = []
         self.chat_messages.append(self.system_message)
@@ -183,5 +182,5 @@ class Memory:
         self.chat_messages.append({"role": "user", "content": user_message})
         print(self.chat_messages)
         response = self.create_chat_completion(self.chat_messages)
-        self.chat_messages.append({"role": "assistant", "content": response})
+        # self.chat_messages.append({"role": "assistant", "content": response})
         return response

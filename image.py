@@ -23,7 +23,7 @@ def decode_base64_to_image(encoding):
 
 
 def generate_draw_with_stable_v2(prompt, save_path):
-    url = "http://10.73.3.223:55233"
+    url = "http://127.0.0.1:7860"
 
     payload = {
         "prompt": prompt,
@@ -58,7 +58,7 @@ def generate_draw(drawing_content, save_path):
 
 
 def generate_controlnet(prompt, base_image):
-    url = "http://10.73.3.223:55233"
+    url = "http://127.0.0.1:7860"
     print("[image to image]starting generating image on the basis of controlnet...")
     print("[txt to image with controlnet]starting generating image on the basis of controlnet...")
     print("[image to prompt]", prompt)

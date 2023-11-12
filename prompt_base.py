@@ -34,8 +34,29 @@ object_prompt = """
         "description": "$description"
     }}
 """
-
-
+sound_prompt = """
+    You are an expert on prompting engineering. I will give you some examples, fill the prompt with knowledge for <{content}>. 
+    
+    Example: An audience cheering and clapping.
+    Example: Rolling thunder with lightning strikes.
+    Example: Car engine sound.
+    
+    The return format is JSON format:
+    {{
+        "prompt": "$YOUR_PROMPT"
+    }}
+"""
+drawing_prompt_new = """
+    You are an expert on prompting engineering for text to image generation. I will give you some examples, fill the prompt with knowledge for <{content}>. 
+    template "[character or landscape], [artist], [style]",
+    Example: Cute small dog, full character, design by mark ryden and pixar and hayao miyazaki, 2D, animation, cartoon, high quality, 4k. Respond the prompt only, in English.
+    Example" best high quality landscape. Ethereal gardens of marble built in a shining teal river in future city. By Dorian Cleavenger. Long shot, studio lighting, octane render.
+    
+    The return format is JSON format:
+    {{
+        "prompt": "$YOUR_PROMPT"
+    }}
+"""
 drawing_prompt = """
     Stable Diffusion is an AI art generation model similar to DALLE-2.
     Here are some prompts for generating art with Stable Diffusion. 

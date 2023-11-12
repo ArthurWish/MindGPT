@@ -16,9 +16,6 @@ CORS(app, resources=r"/*", supports_credentials=True, origins='*')
 os.makedirs('./static', exist_ok=True)
 os.makedirs('./static/images', exist_ok=True)
 
-object_memory = Memory(model=GPTType.gpt_4)
-function_memory = Memory(model=GPTType.gpt_4)
-logic_memory = Memory(model=GPTType.gpt_4)
 
 
 @app.route('/hello', methods=['GET'])
@@ -28,11 +25,8 @@ def hello():
 
 @app.route('/api/new_object', methods=['POST'])
 def new_object():
-    project = request.json.get('project')
+    object_memory = Memory(model=GPTType.gpt_4)
     memory_dict = request.json.get('memory_dict')
-    print(project, memory_dict)
-    if project is None:
-        return "project is none"
     user_message = object_prompt.format(memory=memory_dict)
     response = object_memory.ask_gpt(user_message=user_message)
     print("response", response)
@@ -45,9 +39,9 @@ def new_object():
 @app.route('/api/text_to_image', methods=['POST'])
 def text_to_image():
     text = request.json.get('text')
-    drawing_agent = GPTTools(GPTType.gpt_3, "Output the IDEA in JSON format.")
+    drawing_agent = GPTTools(GPTType.gpt_3, "Output in JSON format.")
     response = drawing_agent.create_chat_completion(
-        user_message=drawing_prompt.format(drawing=text))
+        user_message=drawing_prompt_new.format(drawing=text))
     response = json.loads(response)
     print("prompt", response['prompt'])
     image_base64 = generate_draw(response["prompt"], './static/test.png')
@@ -66,9 +60,9 @@ def image_to_image():
     bg = Image.new('RGBA', img.size, (255, 255, 255))
     combined = Image.alpha_composite(bg, img)
     combined.convert('RGB').save('./static/temp.png', 'PNG')
-    drawing_agent = GPTTools(GPTType.gpt_3, "Output the IDEA in JSON format.")
+    drawing_agent = GPTTools(GPTType.gpt_3, "Output in JSON format.")
     response = drawing_agent.create_chat_completion(
-        user_message=drawing_prompt.format(drawing=text))
+        user_message=drawing_prompt_new.format(drawing=text))
     response = json.loads(response)
     print("prompt", response['prompt'])
     image_base64 = generate_controlnet(
@@ -97,6 +91,7 @@ def text_to_sound():
 
 @app.route('/api/character_decomposition', methods=['POST'])
 def character_decomposition():
+    function_memory = Memory(model=GPTType.gpt_4)
     question = request.json.get('question')
     memory_dict = request.json.get('memory_dict')
     if memory_dict is None:
@@ -112,6 +107,7 @@ def character_decomposition():
 
 @app.route('/api/new_logic', methods=['POST'])
 def new_logic():
+    logic_memory = Memory(model=GPTType.gpt_4)
     question = request.json.get('question')
     memory_dict = request.json.get('memory_dict')
     # print(function)
