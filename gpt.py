@@ -2,7 +2,7 @@ import ast
 from langchain.prompts import ChatPromptTemplate
 from langchain.chat_models import ChatOpenAI
 from env import *
-import openai
+from openai import OpenAI
 from langchain.prompts import PromptTemplate
 from typing import List, Dict
 from langchain.chains import LLMChain
@@ -11,13 +11,14 @@ from prompt import *
 import re
 
 init_env()
-openai.api_key = os.getenv("OPENAI_API_KEY")
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client.api_key = os.getenv("OPENAI_API_KEY")
 
 
 class GPTChain:
 
     def __init__(self, input_var: List, _template: str, output_var: List) -> None:
-        llm = ChatOpenAI(model=MODEL, openai_api_key=openai.api_key)
+        llm = ChatOpenAI(model=MODEL, openai_api_key=client.api_key)
         prompt = PromptTemplate(
             input_variables=input_var,
             template=_template
@@ -43,7 +44,7 @@ class GPTChain:
 class FewGPTChain:
 
     def __init__(self, input_var: List, few_shot_prompt: str, output_var: List) -> None:
-        llm = ChatOpenAI(model=MODEL, openai_api_key=openai.api_key)
+        llm = ChatOpenAI(model=MODEL, openai_api_key=client.api_key)
         self.chain = LLMChain(prompt=few_shot_prompt, llm=llm)
         self.input_var = input_var
         self.output_var = output_var
@@ -79,9 +80,9 @@ class GPTFineTuned:
 
     def __init__(self, model_id) -> None:
         self.model_id = model_id
-    
+
     def code_generation(self, user_message):
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model=self.model_id,
             messages=[
                 {"role": "system",
@@ -89,7 +90,7 @@ class GPTFineTuned:
                 {"role": "user", "content": user_message}
             ]
         )
-        return re.findall(r'\"(.*?)\"', response.choices[0].message["content"])
+        return re.findall(r'\"(.*?)\"', response.choices[0].message.content)
 
 
 def create_chat_completion(messages,
@@ -98,14 +99,14 @@ def create_chat_completion(messages,
                            max_tokens=None) -> str:
     """Create a chat completion using the OpenAI API"""
     response = None
-    response = openai.ChatCompletion.create(model=model,
-                                            messages=messages,
-                                            temperature=temperature,
-                                            max_tokens=max_tokens)
+    response = client.chat.completions.create(model=model,
+                                              messages=messages,
+                                              temperature=temperature,
+                                              max_tokens=max_tokens)
     if response is None:
         raise RuntimeError("Failed to get response")
 
-    return response.choices[0].message["content"]
+    return response.choices[0].message.content
 
 
 def translate_to_english(content):
@@ -142,16 +143,16 @@ class GPTTools:
         """Create a chat completion using the OpenAI API"""
         user_message = {"role": "user", "content": user_message}
         self.messages.append(user_message)
-        response = openai.ChatCompletion.create(model=self.model,
-                                                messages=self.messages,
-                                                response_format={
-                                                    "type": "json_object"},
-                                                temperature=temperature,
-                                                max_tokens=max_tokens)
+        response = client.chat.completions.create(model=self.model,
+                                                  messages=self.messages,
+                                                  response_format={
+                                                      "type": "json_object"},
+                                                  temperature=temperature,
+                                                  max_tokens=max_tokens)
         if response is None:
             raise RuntimeError("Failed to get response")
 
-        return response.choices[0].message["content"]
+        return response.choices[0].message.content
 
 
 class Memory:
@@ -168,20 +169,18 @@ class Memory:
         """Create a chat completion using the OpenAI API"""
         response = None
 
-        response = openai.ChatCompletion.create(model=self.model,
-                                                messages=messages,
-                                                response_format={
-                                                    "type": "json_object"},
-                                                temperature=temperature,
-                                                max_tokens=max_tokens)
+        response = client.chat.completions.create(model=self.model,
+                                                  messages=messages,
+                                                  response_format={
+                                                      "type": "json_object"},
+                                                  temperature=temperature,
+                                                  max_tokens=max_tokens)
         if response is None:
             raise RuntimeError("Failed to get response")
-
-        return response.choices[0].message["content"]
+        return response.choices[0].message.content
 
     def ask_gpt(self, user_message):
-        user_message = {"role": "user", "content": user_message}
-        self.chat_messages.append(user_message)
+        self.chat_messages.append({"role": "user", "content": user_message})
         print(self.chat_messages)
         response = self.create_chat_completion(self.chat_messages)
         self.chat_messages.append({"role": "assistant", "content": response})

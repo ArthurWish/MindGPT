@@ -1,7 +1,6 @@
 import base64
 import io
 import re
-from typing import List
 from flask import Flask, jsonify, request, make_response
 import os
 from flask_cors import CORS, cross_origin
@@ -31,14 +30,15 @@ def hello():
 def new_object():
     project = request.json.get('project')
     memory_dict = request.json.get('memory_dict')
+    print(project, memory_dict)
     if project is None:
         return "project is none"
     user_message = object_prompt.format(memory=memory_dict)
     response = object_memory.ask_gpt(user_message=user_message)
     print("response", response)
     response = json.loads(response)
-    print(response["object"])  # description
-    print(response["description"])
+    # print("response["object"]", response["object"])  # description
+    # print(response["description"])
     return jsonify({'spriteName': response["object"], 'description': response["description"]})
 
 
@@ -49,12 +49,14 @@ def text_to_image():
     response = drawing_agent.create_chat_completion(
         user_message=drawing_prompt.format(drawing=text))
     response = json.loads(response)
+    print("prompt", response['prompt'])
     image_base64 = generate_draw(response["prompt"], './static/test.png')
     return jsonify({'image': image_base64})
 
 
 @app.route('/api/image_to_image', methods=['POST'])
 def image_to_image():
+    print("image_to_image")
     text = request.json.get('text')  # user input
     image_base64 = request.json.get('user_image')  # base64
     if image_base64 is None:
@@ -68,6 +70,7 @@ def image_to_image():
     response = drawing_agent.create_chat_completion(
         user_message=drawing_prompt.format(drawing=text))
     response = json.loads(response)
+    print("prompt", response['prompt'])
     image_base64 = generate_controlnet(
         prompt=response['prompt'], base_image="./static/temp.png")
     return jsonify({'image': image_base64})
@@ -125,15 +128,11 @@ def new_logic():
 @app.route('/api/generate_code', methods=['POST'])
 def generate_code():
     logic = request.json.get('logic')
-    # previous_code = request.json.get('previous_code')
-    # chain = FewGPTChain(CodeGeneration.input_var,
-    #                  CodeGeneration.final_prompt, CodeGeneration.output_var)
-    # code = chain.run({"logic": logic})
     gpt_tuned = GPTFineTuned("ft:gpt-3.5-turbo-0613:personal::8HnuPdtX")
     code = gpt_tuned.code_generation(logic)
-    extracted_list = re.findall(r'\"(.*?)\"', code)
-    return jsonify({'code': extracted_list})
+    # extracted_list = re.findall(r'\"(.*?)\"', code)
+    return jsonify({'code': code})
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5510, debug=False)
+    app.run(host='0.0.0.0', port=5500, debug=False)
