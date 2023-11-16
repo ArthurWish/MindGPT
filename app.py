@@ -27,6 +27,8 @@ def hello():
 def new_object():
     object_memory = Memory(model=GPTType.gpt_4)
     memory_dict = request.json.get('memory_dict')
+    if memory_dict is None:
+        raise "Input the mind map"
     user_message = object_prompt.format(memory=memory_dict)
     response = object_memory.ask_gpt(user_message=user_message)
     print("response", response)
@@ -41,7 +43,7 @@ def new_object():
 @app.route('/api/text_to_image', methods=['POST'])
 def text_to_image():
     text = request.json.get('text')
-    drawing_agent = GPTTools(GPTType.gpt_3, "Response in English. Output in JSON format.")
+    drawing_agent = GPTTools(GPTType.gpt_3, "Output in JSON format. Response in English.")
     response = drawing_agent.create_chat_completion(
         user_message=drawing_prompt_new.format(drawing=text))
     response = json.loads(response)
@@ -56,7 +58,7 @@ def image_to_image():
     text = request.json.get('text')  # user input
     image_base64 = request.json.get('user_image')  # base64
     if image_base64 is None:
-        return "image_base64 is none"
+        raise "image_base64 is none"
     base_img_bytes = base64.b64decode(image_base64)
     img = Image.open(io.BytesIO(base_img_bytes)).convert('RGBA')
     bg = Image.new('RGBA', img.size, (255, 255, 255))
@@ -102,7 +104,7 @@ def character_decomposition():
     question = request.json.get('question')
     memory_dict = request.json.get('memory_dict')
     if memory_dict is None:
-        return "Input the mind map"
+        raise "Input the mind map"
     user_message = function_prompt.format(
         question=question, memory=memory_dict)
     response = function_memory.ask_gpt(user_message=user_message)

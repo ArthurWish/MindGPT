@@ -180,7 +180,5 @@ class Memory:
 
     def ask_gpt(self, user_message):
         self.chat_messages.append({"role": "user", "content": user_message})
-        print(self.chat_messages)
-        response = self.create_chat_completion(self.chat_messages)
         # self.chat_messages.append({"role": "assistant", "content": response})
-        return response
+        return self.create_chat_completion(self.chat_messages)

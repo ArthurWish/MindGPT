@@ -34,28 +34,36 @@ object_prompt = """
     }}
 """
 sound_prompt = """
-    You are an expert on prompting engineering. I will give you some examples, fill the prompt with knowledge for <{sound}>. 
+    You are an expert on prompting engineering. I will give you some examples.
     
     Example: An audience cheering and clapping.
     Example: Rolling thunder with lightning strikes.
     Example: Car engine sound.
     
-    The return format is JSON format:
+    Translate detected Chinese into English and no need to write down the reasoning process, just tell me the final prompt. 
+    
+    My text input is {drawing}. The return format is JSON format:
     {{
         "prompt": "$YOUR_PROMPT"
     }}
 """
 drawing_prompt_new = """
-    You are an expert on prompting engineering for text to image generation. I will give you some examples, fill the prompt with knowledge for <{drawing}>. 
-    template "[character or landscape], [artist], [style]",
+    You are an expert on prompting engineering for text to image generation. I will give you some examples, write the prompt. 
+    
     Example: Cute small dog, full character, design by mark ryden and pixar and hayao miyazaki, 2D, animation, cartoon, high quality, 4k. Respond the prompt only, in English.
     Example" best high quality landscape. Ethereal gardens of marble built in a shining teal river in future city. By Dorian Cleavenger. Long shot, studio lighting, octane render.
     
-    The return format is JSON format:
+    The prompt should adhere to and include all of the following rules:
+    
+    - Translate detected Chinese into English and no need to write down the reasoning process, just tell me the final prompt. 
+    - If the text input is about characters, provide a white background and don't have complex backgrounds. If the text input is about landscape, don't show any characters, just objects related to the landscape.
+    
+    My text input is {drawing}. The return format is JSON format:
     {{
         "prompt": "$YOUR_PROMPT"
     }}
 """
+
 drawing_prompt = """
     Stable Diffusion is an AI art generation model similar to DALLE-2.
     Here are some prompts for generating art with Stable Diffusion. 

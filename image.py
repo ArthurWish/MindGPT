@@ -38,7 +38,7 @@ def generate_draw_with_stable_v2(prompt, save_path):
     data = response.json()
     for encoded_result in data['images']:
         result_data = base64.b64decode(encoded_result)
-        with open(f"{save_path}.png", "wb") as f:
+        with open(f"{save_path}", "wb") as f:
             f.write(result_data)
         # image = Image.open(io.BytesIO(base64.b64decode(i.split(",", 1)[0])))
     # for i, image in enumerate(data["artifacts"]):
@@ -105,6 +105,6 @@ def generate_controlnet(prompt, base_image):
 
     data = response.json()
     image = decode_base64_to_image(response.json()['images'][0])
-    image.save("./image_to_image.png", format='PNG')
+    image.save("./static/image_to_image.png", format='PNG')
 
     return data['images'][0]
