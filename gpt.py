@@ -155,9 +155,9 @@ class GPTTools:
 
 
 class Memory:
-    def __init__(self, model):
-        self.system_message = {
-            "role": "system", "content": "You are a helpful Scratch programming teacher. Answer in Chinese. The return format is JSON format."}
+    def __init__(self, model, system_message={
+            "role": "system", "content": "You are a helpful Scratch programming teacher. Answer in Chinese. The return format is JSON format."}):
+        self.system_message = system_message
         self.model = model
         self.chat_messages = []
         self.chat_messages.append(self.system_message)

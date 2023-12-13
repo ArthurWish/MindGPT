@@ -6,6 +6,19 @@ import base64
 import requests
 
 
+def extract_block_types(data):
+    block_types = []
+    for item in data:
+        if 'block_type' in item:
+            block_types.append(item['block_type'])
+            # 如果有嵌套的字典，递归提取
+            if 'arguments' in item:
+                for key, value in item['arguments'].items():
+                    if isinstance(value, dict):
+                        block_types.extend(extract_block_types([value]))
+    return block_types
+
+
 def decode_base64_to_image(encoding):
     if encoding.startswith("data:image/"):
         encoding = encoding.split(":")[1].split(",")[1]

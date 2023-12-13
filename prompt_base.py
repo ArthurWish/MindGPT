@@ -1,3 +1,68 @@
+subject_extracted_prompt = """
+    The content summarized in one topic sentence must be concise and in line with the cognitive level of children.
+    User_input: {input}
+    The return format is JSON format:
+    {{
+        "subject": "$Extracted_Subject"
+    }}
+"""
+
+object_generation_prompt = """
+    Your task is to first extract the programming objects that already exist in the mind map, and then generate three new objects based on the theme of the mind map. If you think the object does not exist, generate three new objects.
+    The generated object should not duplicate the content of the mind map, and the description must be concise to meet the level of children.
+    Following are some examples.
+    Mind map: {{
+        "赛车游戏": {{
+            "车": {{
+                "描述": "一辆蓝色的车"
+            }},
+            "障碍物": {{
+                "描述": "用来阻挡车"
+            }}
+        }}
+    }}
+    Extracted objects: ["车", "障碍物"]
+    Generated object: {{ "赛道": "汽车应该在赛道内行驶" }}
+    
+    Mind map: {{
+        "小猫钓鱼": {{
+            "小猫": {{
+                "描述": "一只白色的可爱小猫"
+            }},
+            "鱼": {{
+                "描述": "在水里游的鱼"
+            }}
+        }}
+    }}
+    Extracted objects: ["小猫", "鱼"]
+    Generated object: {{ "钓鱼竿": "猫手里的鱼竿，用来钓鱼" }}
+    The following is a mind map that children will want to complete: {memory}.
+    No need to write down the reasoning process, just tell me the generated object. The return format is JSON format:
+    {{
+        "object1": "$Generated_Object",
+        "object2": "$Generated_Object",
+        "object3": "$Generated_Object"
+    }}
+"""
+
+logic_extracted_prompt = """
+    The code logic extracted below must be concise and in line with children's cognitive level.
+    User input: {input}
+    No need to write down the reasoning process. The return format is JSON format:
+    {{
+        "extracted_logic": "$Extracted_Logic"
+    }}
+"""
+logic_queries_prompt = """
+    Please generate three questions to ask about the following content that requires Scratch programming to improve the quality of Scratch code.
+    User_input: {input}
+    No need to write down the reasoning process. The return format is JSON format:
+    {{
+        "question1": "$Logic_question",
+        "question2": "$Logic_question,
+        "question3": "$Logic_question"
+    }}
+"""
 object_prompt = """
     Your task is to first extract the programming objects that already exist in the mind map, and then generate new ones based on the theme of the mind map. If you think the object does not exist, generate a new one.
     The generated object should not duplicate the content of the mind map, and the description must be concise to meet the level of children.
@@ -42,7 +107,7 @@ sound_prompt = """
     
     Translate detected Chinese into English and no need to write down the reasoning process, just tell me the final prompt. 
     
-    My text input is {drawing}. The return format is JSON format:
+    My text input is {sound}. The return format is JSON format:
     {{
         "prompt": "$YOUR_PROMPT"
     }}
@@ -51,7 +116,7 @@ drawing_prompt_new = """
     You are an expert on prompting engineering for text to image generation. I will give you some examples, write the prompt. 
     
     Example: Cute small dog, full character, design by mark ryden and pixar and hayao miyazaki, 2D, animation, cartoon, high quality, 4k. Respond the prompt only, in English.
-    Example" best high quality landscape. Ethereal gardens of marble built in a shining teal river in future city. By Dorian Cleavenger. Long shot, studio lighting, octane render.
+    Example: best high quality landscape. Ethereal gardens of marble built in a shining teal river in future city. By Dorian Cleavenger. Long shot, studio lighting, octane render.
     
     The prompt should adhere to and include all of the following rules:
     
@@ -171,4 +236,125 @@ logic_prompt = """
     {{
         "logic": "$GENERATED_LOGIC"
     }}
+"""
+
+code_prompt = """
+    Select blocks from the Scratch blocks below to program. Try to use the control, event, sensing and variable blocks. Please ensure that the generated blocks can be spliced correctly.
+    Here is an example:
+    {{
+        "code": [{{'block_type': 'event_whenflagclicked', 'arguments': {{}}}}, {{'block_type': 'control_forever', 'arguments': {{}}}}, {{'block_type': 'control_if', 'arguments': {{'condition': {{'block_type': 'sensing_touchingobject', 'arguments': {{'object': '障碍物'}}}}, {{'block_type': 'looks_seteffectto', 'arguments': {{'effect': 'color', 'value': 100}}, {{'block_type': 'operator_subtract', 'arguments': {{'NUM1': {{'block_type': 'sensing_of', 'arguments': {{'property': 'score', 'object': 'Stage'}}, 'NUM2': 1}}]
+    }}
+    
+    User input: {user_input}
+    No need to write down the reasoning process, just tell me the final result. The return format is JSON format:
+        {{
+            "code": "$block_type"
+        }}
+    
+    Scratch blocks: 
+        askandwait
+        backdropnumbername
+        control_create_clone_of
+        control_delete_this_clone
+        control_forever
+        control_if
+        control_if_else
+        control_repeat
+        control_start_as_clone
+        control_stop
+        control_wait
+        costumenumbername
+        current
+        direction
+        event_broadcast
+        event_broadcastandwait
+        event_whenbackdropswitchesto
+        event_whenbroadcastreceived
+        event_whenflagclicked
+        event_whengreaterthan
+        event_whenkeypressed
+        event_whenthisspriteclicked
+        looks_changeeffectby
+        looks_changesizeby
+        looks_cleargraphiceffects
+        looks_goforwardbackwardlayers
+        looks_gotofrontback
+        looks_hide
+        looks_nextbackdrop
+        looks_nextcostume
+        looks_say
+        looks_sayforsecs
+        looks_seteffectto
+        looks_setsizeto
+        looks_show
+        looks_switchbackdropto
+        looks_switchcostumeto
+        looks_think
+        looks_thinkforsecs
+        loudness
+        motion_changexby
+        motion_changeyby
+        motion_glidesecstoxy
+        motion_glideto
+        motion_goto
+        motion_gotoxy
+        motion_ifonedgebounce
+        motion_movesteps
+        motion_pointindirection
+        motion_pointtowards
+        motion_setrotationstyle
+        motion_setx
+        motion_sety
+        motion_turnleft
+        motion_turnright
+        of
+        operator_add
+        operator_and
+        operator_contains
+        operator_divide
+        operator_equals
+        operator_gt
+        operator_join
+        operator_length_of
+        operator_letter_of
+        operator_lt
+        operator_mathop
+        operator_mod
+        operator_multiply
+        operator_not
+        operator_or
+        operator_random
+        operator_round
+        operator_subtract
+        repeat_until
+        sensing_colortouchingcolor
+        sensing_daysince2000
+        sensing_distanceto
+        sensing_keypressed
+        sensing_mousedown
+        sensing_mousex
+        sensing_mousey
+        sensing_resettimer
+        sensing_setdragmode
+        sensing_touchingcolor
+        sensing_touchingobject
+        size
+        sound_changeeffectby
+        sound_changevolumeby
+        sound_clearsoundeffects
+        sound_play
+        sound_playuntildone
+        sound_seteffectto
+        sound_setvolumeto
+        sound_stopallsounds
+        timer
+        username
+        wait_until
+        x_position
+        y_position
+        my variable
+        data_setvariableto
+        data_changevariableby
+        data_showvariable
+        data_hidevariable
 """
